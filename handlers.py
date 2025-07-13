@@ -1,21 +1,20 @@
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters, ConversationHandler
+from database import save_user_profile, get_user_profile
+
+import re 
+
+
+def contains_numbers(s):
+    return bool(re.search(r'\d', s))
+def is_valid_phone(phone):
+    pattern = r'^(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$'
+    return bool(re.match(pattern, phone.strip()))
 
 
 
 # Conversation states
 PARENT_NAME, CHILD_NAME, AGE, GRADE, GOAL, TIMEZONE, CONTACT = range(7)
-
-#placeholder for now, will check the database later
-def get_user(user_id : int):
-    return None
-
-def save_user_profile(user_id: int, profile_data: dict):
-    """Placeholder function to save user profile to database"""
-    print(f"Saving profile for user {user_id}: {profile_data}")
-    # Here you would save to your database
-    pass
-
 
 
 # Define the function to send the main menu
@@ -26,12 +25,16 @@ async def send_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     # Check if the user has already created a profile
-    if get_user(user_id) is None:
+    user_profile = get_user_profile(user_id)
+    if not user_profile:
         # Menu before profile creation
         menu_keyboard = [
             [KeyboardButton("👤 Мой профиль")],
             [KeyboardButton("🎓 Вводный урок")]
         ]
+
+        reply_markup = ReplyKeyboardMarkup(menu_keyboard, resize_keyboard=True)
+        await update.message.reply_text("Главное меню:", reply_markup=reply_markup)
     else:
         # Menu after profile creation
         menu_keyboard = [
@@ -41,8 +44,10 @@ async def send_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [KeyboardButton("ℹ️ Информация"), KeyboardButton("🧑‍🏫 Связь с учителем")]
         ]
 
-    reply_markup = ReplyKeyboardMarkup(menu_keyboard, resize_keyboard=True)
-    await update.message.reply_text("Главное меню:", reply_markup=reply_markup)
+
+        reply_markup = ReplyKeyboardMarkup(menu_keyboard, resize_keyboard=True)
+        await update.message.reply_text(f" Hello {user_profile['parent_name']}, Главное меню:", reply_markup=reply_markup)
+
 
 # Profile creation handlers
 async def create_profile(update: Update, context: ContextTypes.DEFAULT_TYPE):

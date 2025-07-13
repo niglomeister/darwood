@@ -22,6 +22,7 @@ def init_database():
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        print("created database ..")
         conn.commit()
 
 def save_user_profile(user_id: int, profile_data: Dict[str, Any]) -> bool:

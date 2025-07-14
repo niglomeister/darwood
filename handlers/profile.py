@@ -239,3 +239,18 @@ async def cancel_profile_creation(update: Update, context: ContextTypes.DEFAULT_
     await send_main_menu(update, context)
     return ConversationHandler.END
    
+def profile_conv_handler():
+    return ConversationHandler(
+        entry_points=[MessageHandler(filters.Text(["👤 Мой профиль"]), create_profile)],
+        states={
+            PARENT_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, parent_name)],
+            CHILD_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, child_name)],
+            AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
+            GRADE: [MessageHandler(filters.TEXT & ~filters.COMMAND, grade)],
+            GOAL: [MessageHandler(filters.TEXT & ~filters.COMMAND, goal)],
+            TIMEZONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, timezone)],
+            CONTACT: [MessageHandler(filters.TEXT & ~filters.COMMAND, contact)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_profile_creation)],
+        per_user=True
+    )

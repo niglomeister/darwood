@@ -1,16 +1,7 @@
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters, ConversationHandler
 from database import save_user_profile, get_user_profile
-
-import re 
-
-
-def contains_numbers(s):
-    return bool(re.search(r'\d', s))
-def is_valid_phone(phone):
-    pattern = r'^(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$'
-    return bool(re.match(pattern, phone.strip()))
-
+from utils import contains_numbers, is_valid_phone
 
 
 # Conversation states
@@ -19,6 +10,7 @@ PARENT_NAME, CHILD_NAME, AGE, GRADE, GOAL, TIMEZONE, CONTACT = range(7)
 
 # Define the function to send the main menu
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("start handler called")
     await send_main_menu(update, context)
 
 async def send_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
